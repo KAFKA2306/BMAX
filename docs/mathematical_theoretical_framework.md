@@ -104,7 +104,8 @@ $$dS_t = rS_t dt + \sqrt{v_t}S_t dW_t^{(1)}$$
 $$dv_t = \kappa(\theta - v_t)dt + \sigma_v\sqrt{v_t}dW_t^{(2)}$$
 
 **相関構造:**
-$$d\langle W^{(1)}, W^{(2)} \rangle_t = \rho dt$$
+
+$$d\langleW^{(1)}, W^{(2)} \rangle_t = \rho dt$$
 
 ### 3.3 ジャンプ拡散複合オプション
 
@@ -229,7 +230,7 @@ $$V_t(W_t) = \max_{w_t} \mathbb{E}[U(W_{t+1}) + \beta V_{t+1}(W_{t+1}) \mid \mat
 
 Bitcoin市場センチメントの転換社債価格への影響：
 
-$$\text{Sentiment Premium}_t = \theta_0 + \theta_1 \cdot \text{VIX}_t + \theta_2 \cdot \text{Bitcoin Fear & Greed}_t + \theta_3 \cdot \text{Social Media}_t$$
+$$\text{SentimentPremium}_t = \theta_0 + \theta_1 \cdot \text{VIX}_t + \theta_2 \cdot \text{BitcoinFear&Greed}_t + \theta_3 \cdot \text{SocialMedia}_t$$
 
 ### 8.2 バブル検知理論
 

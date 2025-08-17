@@ -72,7 +72,7 @@ where $CR$ is the conversion ratio and $CP$ the conversion price.
 
 Individual convertible bond illiquidity transforms through ETF structure:
 
-$$\mathcal{L}_{ETF}(t) = f\left(\sum_{i=1}^n w_i \mathcal{L}_i(t), \text{Creation/Redemption}, \text{Market Making}\right)$$
+$$\mathcal{L}_{ETF}(t) = f\left(\sum_{i=1}^n w_i \mathcal{L}_i(t), \text{Creation/Redemption}, \text{MarketMaking}\right)$$
 
 Our empirical results show a liquidity transformation ratio of 1.518, indicating significant improvement over individual bond liquidity.
 
@@ -119,12 +119,15 @@ Bitcoin-aware risk metrics yield:
 ### 5.1 Research Hypotheses
 
 **H1: Nonlinear Price Transmission**
+
 $$\Delta CV_t = \alpha + \beta_1 \Delta B_t + \beta_2 (\Delta B_t)^2 + \gamma \mathbb{I}_{|\Delta B_t| > \tau} + \epsilon_t$$
 
 **H2: ETF Liquidity Enhancement**
+
 $$\text{Liquidity}_{BMAX,t} > \mathbb{E}[\text{Liquidity}_{individual}]$$
 
 **H3: Downside Risk Protection**
+
 $$\text{Downside Risk}_{BMAX} < \text{Downside Risk}_{Bitcoin Direct}$$
 
 ### 5.2 Methodology Integration
@@ -225,19 +228,3 @@ The computational implementation validates theoretical predictions and provides 
 4. Kyle, A. S. (1985). Continuous auctions and insider trading. *Econometrica*, 53(6), 1315-1335.
 
 5. Liu, Y., & Tsyvinski, A. (2021). Risks and returns of cryptocurrency. *Review of Financial Studies*, 34(6), 2689-2727.
-
----
-
-**Author Information:**
-Financial Engineering Research Team  
-Computational Finance Laboratory  
-*Corresponding author: [research-team@example.com]*
-
-**Data Availability:**
-Complete computational framework and analysis code available at: [GitHub Repository]
-
-**Funding:**
-This research was supported by the Digital Asset Financial Engineering Initiative.
-
-**Conflicts of Interest:**
-The authors declare no conflicts of interest.
