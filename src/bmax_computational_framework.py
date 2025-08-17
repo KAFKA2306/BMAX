@@ -25,8 +25,62 @@ import matplotlib.pyplot as plt
 from dataclasses import dataclass
 from typing import Dict, List, Tuple, Optional, Callable
 from abc import ABC, abstractmethod
+from functools import lru_cache
+import multiprocessing as mp
 import warnings
 warnings.filterwarnings('ignore')
+
+# =============================================================================
+# 入力値検証システム
+# =============================================================================
+
+class ParameterValidator:
+    """パラメータ検証クラス"""
+    
+    @staticmethod
+    def validate_price(price: float, name: str = "price") -> None:
+        """価格パラメータの検証"""
+        if not isinstance(price, (int, float)):
+            raise TypeError(f"{name} must be a number")
+        if price <= 0:
+            raise ValueError(f"{name} must be positive, got {price}")
+        if price > 1e9:  # 10億ドル制限
+            raise ValueError(f"{name} too large, got {price}")
+    
+    @staticmethod
+    def validate_volatility(volatility: float) -> None:
+        """ボラティリティの検証"""
+        if not isinstance(volatility, (int, float)):
+            raise TypeError("Volatility must be a number")
+        if volatility < 0:
+            raise ValueError(f"Volatility must be non-negative, got {volatility}")
+        if volatility > 3.0:  # 300%制限
+            raise ValueError(f"Volatility too high, got {volatility} (max 3.0)")
+    
+    @staticmethod
+    def validate_correlation(correlation: float, name: str = "correlation") -> None:
+        """相関係数の検証"""
+        if not isinstance(correlation, (int, float)):
+            raise TypeError(f"{name} must be a number")
+        if not (-1.0 <= correlation <= 1.0):
+            raise ValueError(f"{name} must be between -1 and 1, got {correlation}")
+    
+    @staticmethod
+    def validate_time_to_maturity(time: float) -> None:
+        """満期までの時間の検証"""
+        if not isinstance(time, (int, float)):
+            raise TypeError("Time to maturity must be a number")
+        if time < 0:
+            raise ValueError(f"Time to maturity must be non-negative, got {time}")
+        if time > 50:  # 50年制限
+            raise ValueError(f"Time to maturity too long, got {time} years")
+    
+    @staticmethod
+    def validate_bitcoin_stock_consistency(bitcoin_price: float, stock_price: float) -> None:
+        """Bitcoin価格と株価の整合性チェック"""
+        if stock_price > bitcoin_price * 0.1:
+            import warnings
+            warnings.warn(f"Warning: 株価({stock_price})がビットコイン価格({bitcoin_price})の10%を超えています")
 
 # =============================================================================
 # 基礎データ構造
@@ -83,10 +137,11 @@ class PricingEngine(ABC):
 # =============================================================================
 
 class BitcoinBlackScholesEngine:
-    """Bitcoin特化型Black-Scholesエンジン"""
+    """Bitcoin特化型Black-Scholesエンジン（パフォーマンス最適化済み）"""
     
     def __init__(self, risk_free_rate: float = 0.045):
         self.risk_free_rate = risk_free_rate
+        self._cache_size = 1000  # キャッシュサイズ
     
     def d1(self, S: float, K: float, T: float, sigma: float, q: float = 0.0) -> float:
         """d1パラメータ計算（配当調整済み）"""
@@ -96,8 +151,9 @@ class BitcoinBlackScholesEngine:
         """d2パラメータ計算"""
         return self.d1(S, K, T, sigma, q) - sigma * np.sqrt(T)
     
-    def call_price(self, S: float, K: float, T: float, sigma: float, q: float = 0.0) -> float:
-        """コールオプション価格（Bitcoin企業株式用）"""
+    @lru_cache(maxsize=1000)
+    def _cached_call_price_core(self, S: float, K: float, T: float, sigma: float, q: float = 0.0) -> float:
+        """キャッシュされたコールオプション価格計算（コア部分）"""
         if T <= 0:
             return max(S - K, 0)
         
@@ -108,6 +164,17 @@ class BitcoinBlackScholesEngine:
                 K * np.exp(-self.risk_free_rate * T) * ndtr(d2_val))
         
         return max(call, 0)
+    
+    def call_price(self, S: float, K: float, T: float, sigma: float, q: float = 0.0) -> float:
+        """コールオプション価格（Bitcoin企業株式用）"""
+        # 入力値検証
+        ParameterValidator.validate_price(S, "Stock price")
+        ParameterValidator.validate_price(K, "Strike price")
+        ParameterValidator.validate_time_to_maturity(T)
+        ParameterValidator.validate_volatility(sigma)
+        
+        # キャッシュされた計算を使用
+        return self._cached_call_price_core(S, K, T, sigma, q)
     
     def delta(self, S: float, K: float, T: float, sigma: float, q: float = 0.0) -> float:
         """デルタ計算"""
@@ -153,7 +220,11 @@ class ThreeLayerAssetModel:
         self.correlation_matrix = self._build_correlation_matrix()
     
     def _build_correlation_matrix(self) -> np.ndarray:
-        """三層間相関行列の構築"""
+        """三層間相関行列の構築（数値安定化対応）"""
+        # 入力値検証
+        ParameterValidator.validate_correlation(self.stock_correlation, "stock_correlation")
+        ParameterValidator.validate_correlation(self.cb_correlation, "cb_correlation")
+        
         # Bitcoin-Stock-CB の三次元相関行列
         rho_bs = self.stock_correlation
         rho_sc = self.cb_correlation
@@ -165,33 +236,32 @@ class ThreeLayerAssetModel:
             [rho_bc, rho_sc, 1.0]      # Convertible Bond
         ])
         
+        # 正定値性の確保
+        eigenvals = np.linalg.eigvals(correlation_matrix)
+        min_eigenval = np.min(eigenvals)
+        
+        if min_eigenval < 1e-8:
+            # 微小な正の値を対角要素に追加
+            regularization = 1e-6
+            correlation_matrix += np.eye(3) * regularization
+            print(f"Warning: 相関行列が非正定値でした。正則化パラメータ {regularization} を追加しました。")
+        
         return correlation_matrix
     
-    def simulate_price_paths(self, 
-                           initial_prices: Tuple[float, float, float],
-                           time_horizon: float = 1.0,
-                           n_steps: int = 252,
-                           n_simulations: int = 10000) -> np.ndarray:
-        """
-        三層資産価格パスの同時シミュレーション
-        
-        Returns:
-            価格パス配列 [simulations, assets, time_steps]
-        """
+    def _simulate_chunk(self, args: tuple) -> np.ndarray:
+        """並列処理用のシミュレーションチャンク"""
+        chunk_size, initial_prices, time_horizon, n_steps, L = args
         
         dt = time_horizon / n_steps
         bitcoin_init, stock_init, cb_init = initial_prices
         
         # 価格パス初期化
-        paths = np.zeros((n_simulations, 3, n_steps + 1))
+        paths = np.zeros((chunk_size, 3, n_steps + 1))
         paths[:, 0, 0] = bitcoin_init   # Bitcoin
         paths[:, 1, 0] = stock_init     # Stock
         paths[:, 2, 0] = cb_init        # Convertible Bond
         
-        # Choleskyフレームワークによる相関のある乱数生成
-        L = np.linalg.cholesky(self.correlation_matrix)
-        
-        for sim in range(n_simulations):
+        for sim in range(chunk_size):
             for t in range(1, n_steps + 1):
                 # 独立な正規乱数
                 z_independent = np.random.normal(0, 1, 3)
@@ -230,6 +300,65 @@ class ThreeLayerAssetModel:
                 
                 cb_return = cb_drift + cb_diffusion
                 paths[sim, 2, t] = paths[sim, 2, t-1] * np.exp(cb_return)
+        
+        return paths
+    
+    def simulate_price_paths(self, 
+                           initial_prices: Tuple[float, float, float],
+                           time_horizon: float = 1.0,
+                           n_steps: int = 252,
+                           n_simulations: int = 10000,
+                           use_parallel: bool = True) -> np.ndarray:
+        """
+        三層資産価格パスの同時シミュレーション（並列処理対応）
+        
+        Args:
+            use_parallel: 並列処理を使用するかどうか
+        
+        Returns:
+            価格パス配列 [simulations, assets, time_steps]
+        """
+        
+        # Choleskyフレームワークによる相関のある乱数生成（エラーハンドリング付き）
+        try:
+            L = np.linalg.cholesky(self.correlation_matrix)
+        except np.linalg.LinAlgError:
+            # Choleskyが失敗した場合はSVD分解を使用
+            print("Warning: Cholesky分解が失敗しました。SVD分解を使用します。")
+            U, s, Vt = np.linalg.svd(self.correlation_matrix)
+            # 負の固有値を0にクリップ
+            s = np.maximum(s, 1e-10)
+            L = U @ np.diag(np.sqrt(s))
+        
+        if use_parallel and n_simulations >= 1000:
+            # 並列処理を使用
+            n_cores = min(mp.cpu_count(), 4)  # 最大4コア使用
+            chunk_size = n_simulations // n_cores
+            
+            # 残りのシミュレーション数を調整
+            remainder = n_simulations % n_cores
+            chunk_sizes = [chunk_size] * n_cores
+            if remainder > 0:
+                chunk_sizes[-1] += remainder
+            
+            # 並列処理用の引数
+            args_list = [(size, initial_prices, time_horizon, n_steps, L) 
+                        for size in chunk_sizes if size > 0]
+            
+            try:
+                with mp.Pool(len(args_list)) as pool:
+                    results = pool.map(self._simulate_chunk, args_list)
+                
+                # 結果を結合
+                paths = np.concatenate(results, axis=0)
+                
+            except Exception as e:
+                print(f"Warning: 並列処理が失敗しました。シーケンシャル処理にフォールバック: {e}")
+                use_parallel = False
+        
+        if not use_parallel or n_simulations < 1000:
+            # シーケンシャル処理
+            paths = self._simulate_chunk((n_simulations, initial_prices, time_horizon, n_steps, L))
         
         return paths
     
@@ -417,6 +546,10 @@ class ConvertibleBondEngine(PricingEngine):
               credit_spread: float = None) -> float:
         """転換社債価格総合計算"""
         
+        # 入力値検証
+        ParameterValidator.validate_price(stock_price, "Stock price")
+        ParameterValidator.validate_volatility(volatility)
+        
         # 構成要素の計算
         bond_floor_val = self.bond_floor(credit_spread)
         option_val = self.option_value(stock_price, volatility)
@@ -435,8 +568,15 @@ class ConvertibleBondEngine(PricingEngine):
         h = 0.01
         base_price = self.price(stock_price, volatility)
         
-        # Delta (株価感応度)
-        delta = (self.price(stock_price + h, volatility) - base_price) / h
+        # Delta (株価感応度) - Calculate as percentage change ratio
+        delta_absolute = (self.price(stock_price + h, volatility) - base_price) / h
+        
+        # Normalize delta by current CB price to get percentage sensitivity
+        # This gives us the percentage change in CB price per 1% change in stock price
+        delta = (delta_absolute * stock_price) / base_price if base_price > 0 else 0.0
+        
+        # Ensure delta is bounded [0, 1] for convertible bonds
+        delta = max(0.0, min(1.0, delta))
         
         # Gamma
         gamma = (self.price(stock_price + h, volatility) - 
@@ -634,6 +774,127 @@ class BMXRiskEngine:
             'time_varying_average': avg_time_varying,
             'hedge_effectiveness': 1 - (np.var(asset_returns - min_var_ratio * hedge_returns) / np.var(asset_returns))
         }
+    
+    def enhanced_risk_metrics(self, returns: np.ndarray) -> Dict[str, float]:
+        """追加リスク指標の計算"""
+        if len(returns) == 0:
+            return {}
+        
+        # 基本統計量
+        mean_return = np.mean(returns)
+        std_return = np.std(returns)
+        
+        # VaR指標
+        var_95 = np.percentile(returns, 5)
+        var_99 = np.percentile(returns, 1)
+        
+        # Expected Shortfall (Conditional VaR)
+        tail_returns_95 = returns[returns <= var_95]
+        tail_returns_99 = returns[returns <= var_99]
+        
+        es_95 = np.mean(tail_returns_95) if len(tail_returns_95) > 0 else var_95
+        es_99 = np.mean(tail_returns_99) if len(tail_returns_99) > 0 else var_99
+        
+        # 最大ドローダウン
+        cumulative_returns = np.cumprod(1 + returns)
+        running_max = np.maximum.accumulate(cumulative_returns)
+        drawdowns = (cumulative_returns - running_max) / running_max
+        max_drawdown = np.min(drawdowns)
+        
+        # Sharpe比とSortino比（年率換算）
+        sharpe_ratio = (mean_return / std_return * np.sqrt(252)) if std_return > 0 else 0
+        
+        downside_returns = returns[returns < 0]
+        downside_std = np.std(downside_returns) if len(downside_returns) > 0 else std_return
+        sortino_ratio = (mean_return / downside_std * np.sqrt(252)) if downside_std > 0 else 0
+        
+        # Calmar比（年率リターン/最大ドローダウン）
+        annual_return = mean_return * 252
+        calmar_ratio = abs(annual_return / max_drawdown) if max_drawdown < 0 else 0
+        
+        return {
+            'var_95': var_95,
+            'var_99': var_99,
+            'expected_shortfall_95': es_95,
+            'expected_shortfall_99': es_99,
+            'max_drawdown': max_drawdown,
+            'sharpe_ratio': sharpe_ratio,
+            'sortino_ratio': sortino_ratio,
+            'calmar_ratio': calmar_ratio,
+            'mean_return': mean_return,
+            'volatility': std_return
+        }
+    
+    def sensitivity_analysis(self, base_prices: tuple, base_conditions: dict, engine=None) -> Dict[str, Dict]:
+        """主要パラメータの感度分析"""
+        if engine is None:
+            # 外部からエンジンを渡されない場合のフォールバック
+            print("Warning: No engine provided for sensitivity analysis")
+            return {}
+        
+        # engine = BMAXIntegratedEngine()  # 外部から渡されたエンジンを使用
+        base_result = engine.comprehensive_analysis(base_prices, base_conditions)
+        base_cb_price = base_result['convertible_bond_analysis']['theoretical_price']
+        
+        sensitivities = {}
+        
+        # Bitcoin価格感度
+        btc_shifts = [-0.3, -0.2, -0.1, 0.1, 0.2, 0.3]
+        btc_sensitivity = {}
+        
+        for shift in btc_shifts:
+            shifted_btc = base_prices[0] * (1 + shift)
+            shifted_prices = (shifted_btc, base_prices[1], base_prices[2])
+            
+            try:
+                result = engine.comprehensive_analysis(shifted_prices, base_conditions)
+                new_price = result['convertible_bond_analysis']['theoretical_price']
+                price_change = (new_price - base_cb_price) / base_cb_price
+                btc_sensitivity[f'btc_{shift:+.0%}'] = price_change
+            except Exception as e:
+                btc_sensitivity[f'btc_{shift:+.0%}'] = np.nan
+        
+        sensitivities['bitcoin_price'] = btc_sensitivity
+        
+        # ボラティリティ感度
+        vol_shifts = [-0.3, -0.2, -0.1, 0.1, 0.2, 0.3]
+        vol_sensitivity = {}
+        base_vol = base_conditions.get('volatility', 0.6)
+        
+        for shift in vol_shifts:
+            shifted_vol = base_vol * (1 + shift)
+            shifted_conditions = base_conditions.copy()
+            shifted_conditions['volatility'] = shifted_vol
+            
+            try:
+                result = engine.comprehensive_analysis(base_prices, shifted_conditions)
+                new_price = result['convertible_bond_analysis']['theoretical_price']
+                price_change = (new_price - base_cb_price) / base_cb_price
+                vol_sensitivity[f'vol_{shift:+.0%}'] = price_change
+            except Exception as e:
+                vol_sensitivity[f'vol_{shift:+.0%}'] = np.nan
+        
+        sensitivities['volatility'] = vol_sensitivity
+        
+        # 株価感度
+        stock_shifts = [-0.3, -0.2, -0.1, 0.1, 0.2, 0.3]
+        stock_sensitivity = {}
+        
+        for shift in stock_shifts:
+            shifted_stock = base_prices[1] * (1 + shift)
+            shifted_prices = (base_prices[0], shifted_stock, base_prices[2])
+            
+            try:
+                result = engine.comprehensive_analysis(shifted_prices, base_conditions)
+                new_price = result['convertible_bond_analysis']['theoretical_price']
+                price_change = (new_price - base_cb_price) / base_cb_price
+                stock_sensitivity[f'stock_{shift:+.0%}'] = price_change
+            except Exception as e:
+                stock_sensitivity[f'stock_{shift:+.0%}'] = np.nan
+        
+        sensitivities['stock_price'] = stock_sensitivity
+        
+        return sensitivities
 
 # =============================================================================
 # 統合BMAX分析エンジン
@@ -662,6 +923,15 @@ class BMAXIntegratedEngine:
         """BMAX の包括的分析"""
         
         bitcoin_price, stock_price, cb_price = current_prices
+        
+        # 入力値検証
+        ParameterValidator.validate_price(bitcoin_price, "Bitcoin price")
+        ParameterValidator.validate_price(stock_price, "Stock price")
+        ParameterValidator.validate_price(cb_price, "Convertible bond price")
+        ParameterValidator.validate_bitcoin_stock_consistency(bitcoin_price, stock_price)
+        
+        volatility = market_conditions.get('volatility', 0.6)
+        ParameterValidator.validate_volatility(volatility)
         volatility = market_conditions.get('volatility', 0.6)
         bitcoin_regime = market_conditions.get('regime', 'normal')
         
@@ -693,6 +963,7 @@ class BMAXIntegratedEngine:
         var = self.risk_engine.bitcoin_aware_var(returns, bitcoin_regime)
         es = self.risk_engine.expected_shortfall(returns, var)
         tail_metrics = self.risk_engine.tail_risk_metrics(returns)
+        enhanced_metrics = self.risk_engine.enhanced_risk_metrics(returns)
         
         # 5. 統合結果
         integrated_results = {
@@ -702,7 +973,8 @@ class BMAXIntegratedEngine:
             'risk_metrics': {
                 'bitcoin_aware_var': var,
                 'expected_shortfall': es,
-                'tail_risk': tail_metrics
+                'tail_risk': tail_metrics,
+                'enhanced_metrics': enhanced_metrics
             },
             'portfolio_characteristics': {
                 'diversification_benefit': correlation_analysis['bitcoin_cb'],
@@ -736,6 +1008,10 @@ class BMAXIntegratedEngine:
             results.append(scenario_result)
         
         return pd.DataFrame(results)
+    
+    def perform_sensitivity_analysis(self, base_prices: tuple, base_conditions: dict) -> Dict[str, Dict]:
+        """感度分析の実行"""
+        return self.risk_engine.sensitivity_analysis(base_prices, base_conditions, self)
 
 # =============================================================================
 # 使用例とテスト
