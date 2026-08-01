@@ -1,239 +1,122 @@
-# BMAX REX 転換社債ETF 包括的研究プロジェクト
+# BMAX — ビットコイン関連転換社債ETFの計算研究
 
-## 🚀 プロジェクト概要
+**リポジトリ:** https://github.com/KAFKA2306/BMAX
 
-**REX BMAX Bitcoin & Crypto Convertible & Income ETF** の理論的・実証的研究を通じて、デジタル資産時代における革新的金融商品の学術的基盤を構築する包括的研究プロジェクトです。
+ビットコイン関連企業の株式・転換社債と、それらを組み入れるETFを題材に、価格感応度、相関、債券フロア、流動性、下方リスクを計算する研究用プロトタイプです。
 
-**🔬 革新性**: ビットコイン関連企業転換社債という新資産クラスの数学的価格決定理論とETF流動性変換メカニズムの世界初の包括的分析
+このリポジトリは理論モデルと計算コードの試作であり、特定ETFの正確な理論価格、実証済みの優位性、「世界初」の研究成果を証明するものではありません。
 
----
+## 現在実装されている内容
 
-## 📁 プロジェクト構造
+`src/bmax_computational_framework.py`には、次の計算クラスと補助処理が含まれます。
 
-```
-BMAX/
-├── docs/                                    # 理論文書・研究設計
-│   ├── mathematical_theoretical_framework.md    # 数学的理論基盤
-│   └── empirical_research_design.md            # 実証研究設計
-├── src/                                     # 計算実装
-│   └── bmax_computational_framework.py         # 統合計算フレームワーク
-├── analysis/                                # 分析結果
-├── models/                                  # 訓練済みモデル
-└── README.md                               # このファイル
-```
+- 入力価格、ボラティリティ、相関、満期の検証
+- Black–Scholes型のオプション計算
+- ビットコイン・企業株式・転換社債の三層モデル
+- 複合オプションの試算
+- 転換社債の債券部分と転換価値の試算
+- ETF流動性・プレミアム／ディスカウントの試算
+- VaR、Expected Shortfallなどのリスク指標
+- モンテカルロ型のシナリオ生成
 
-## 🎯 研究目標
+実装されている数式と、実市場に適合することが検証済みであることは別です。
 
-### 1. 理論的貢献
-- **ハイブリッド証券価格理論**: Bitcoin連動転換社債の数学的価格決定モデル
-- **三層資産相関理論**: Bitcoin → 企業株式 → 転換社債の複合価格形成
-- **ETF流動性変換理論**: 非流動資産のETF化による流動性創出メカニズム
+## 研究上の分解
 
-### 2. 実証的発見
-- **非線形価格伝播**: Bitcoin価格ショックの転換社債への閾値効果
-- **下方リスク保護**: 転換社債構造による下方リスク軽減の定量評価
-- **最適ポートフォリオ配分**: リスク調整後リターン最大化戦略
-
-## 🧮 数学的理論フレームワーク
-
-### 転換社債価値分解
-```
-CV_t = B_t + C_t + Credit_Spread_t + Liquidity_Premium_t
+```text
+ビットコイン価格
+  → 関連企業の事業・財務・株価への影響
+  → 転換社債の債券価値・信用リスク・転換価値
+  → ETFの組入比率・費用・流動性・市場価格
 ```
 
-### 三層資産価格過程
-**第1層: Bitcoin**
-```
-dB_t = μ_B B_t dt + σ_B B_t dW_t^(B)
-```
+実際のETF価格を説明するには、コード内の簡略モデル以外にも次が必要です。
 
-**第2層: Bitcoin企業株式**
-```
-dS_t = μ_S S_t dt + σ_S S_t (ρ dW_t^(B) + √(1-ρ²) dW_t^(S))
-```
+- 正確な組入銘柄とウェイト
+- 各転換社債の条項
+- 発行体の信用スプレッド
+- 金利曲線
+- 転換価格、コール条項、満期
+- ETF経費率と分配方針
+- 設定・交換、マーケットメーカー、出来高
+- 為替と税務
 
-**第3層: 転換社債**
-```
-dCV_t = ∂CV/∂t dt + ∂CV/∂S dS_t + ½∂²CV/∂S² (dS_t)² + ∂CV/∂B dB_t
-```
+## 基本式の位置づけ
 
-### 複合オプション価格決定
-```
-C_compound = S₀ × N₂(a₁, b₁; ρ) - K₁ × e^(-r₁T₁) × N₂(a₂, b₂; ρ) - K₂ × e^(-r₂T₂) × N(b₂)
-```
+転換社債を概念的に次へ分解します。
 
-## 📊 主要研究仮説
-
-### H1: 非線形価格伝播メカニズム
-```
-ΔCV_t = α + β₁ΔB_t + β₂(ΔB_t)² + γ I_{|ΔB_t| > τ} + ε_t
+```text
+転換社債価値
+  ≈ 債券フロア
+  + 株式転換オプション
+  + 信用・流動性・契約条項の調整
 ```
 
-### H2: ETF流動性変換効果
-```
-Liquidity_BMAX,t = δ + Σᵢ wᵢ Liquidity_i,t + η · ETF_Structure_t + u_t
-```
+READMEに以前掲載していた式は研究仮説です。実装との一致、単位、境界条件、校正方法が確認できない式を確定モデルとして扱いません。
 
-### H3: 下方リスク保護効果
-```
-Downside_Risk_BMAX = κ · Downside_Risk_Bitcoin_Direct + Bond_Floor_Effect + v_t
-```
+## 実行
 
-## 💻 計算フレームワーク
+現在、`requirements.txt`と`pyproject.toml`は確認できません。コードが直接importしている主なライブラリは次の通りです。
 
-### 主要コンポーネント
-
-#### 1. **BitcoinBlackScholesEngine**
-- 配当調整済みBlack-Scholesオプション価格決定
-- Greeks計算（Delta, Gamma, Vega, Theta）
-- インプライドボラティリティ算出
-
-#### 2. **ThreeLayerAssetModel**
-- Bitcoin-株式-転換社債の三層相関構造モデリング
-- モンテカルロシミュレーション（相関のある価格パス生成）
-- 実現相関分析
-
-#### 3. **CompoundOptionEngine**
-- 複合オプション価格決定（Geske 1979モデル）
-- 二段階価格形成プロセスのモデリング
-- 複合オプションGreeks計算
-
-#### 4. **ConvertibleBondEngine**
-- 転換社債総合価格決定
-- 債券フロア計算
-- 転換プレミアム分析
-
-#### 5. **ETFLiquidityEngine**
-- 流動性変換比率計算
-- プレミアム・ディスカウント動態分析
-- 作成・償還メカニズムモデリング
-
-#### 6. **BMXRiskEngine**
-- Bitcoin-Aware VaR計算
-- Expected Shortfall（条件付きVaR）
-- テールリスク指標（Hill推定量等）
-- 最適ヘッジ比率算出
-
-### 使用例
-
-```python
-from src.bmax_computational_framework import BMAXIntegratedEngine
-
-# エンジン初期化
-bmax_engine = BMAXIntegratedEngine()
-
-# 現在価格設定
-current_prices = (45000.0, 150.0, 1050.0)  # Bitcoin, Stock, CB
-
-# 市場条件
-market_conditions = {
-    'volatility': 0.65,
-    'regime': 'normal'
-}
-
-# 包括的分析実行
-results = bmax_engine.comprehensive_analysis(current_prices, market_conditions)
-
-# 結果出力
-print(f"理論価格: ${results['convertible_bond_analysis']['theoretical_price']:.2f}")
-print(f"Bitcoin-CB相関: {results['correlation_structure']['bitcoin_cb']:.3f}")
-print(f"VaR (5%): {results['risk_metrics']['bitcoin_aware_var']:.4f}")
+```text
+numpy
+pandas
+scipy
+matplotlib
 ```
 
-## 📈 実証研究設計
-
-### データソース
-- **価格データ**: PandasDataReader, CoinGecko
-- **高頻度データ**: Interactive Brokers, Polygon.io
-- **転換社債データ**: OptionMetrics, TRACE
-- **センチメントデータ**: Twitter, Reddit API
-
-### 分析手法
-1. **計量経済学**: VAR/VECM, GARCH, 閾値回帰, レジーム・スイッチング
-2. **機械学習**: Random Forest, XGBoost, LSTM, Transformer
-3. **ベイズ統計**: MCMC, Hamiltonian Monte Carlo, NUTS
-
-### 検証フレームワーク
-- **時系列交差検証**: Walk-forward analysis
-- **ブートストラップ**: Block bootstrap, Wild bootstrap
-- **ロバスト性検定**: Diebold-Mariano test, Model Confidence Set
-
-## 🎯 期待される成果
-
-
-### 実務的インパクト
-1. **商品開発**: 類似ETF商品の理論的・実証的基盤
-2. **リスク管理**: Bitcoinエクスポージャーの新ヘッジ手法
-3. **投資戦略**: 機関投資家向け最適配分モデル
-
-
-
-## 🚀 クイックスタート
-
-### 1. 環境設定
+検証用の隔離環境を作り、必要な依存関係を導入してから実行します。
 
 ```bash
-# リポジトリクローン
-git clone [repository_url]
-cd BMAX
-
-# 仮想環境作成
-conda create -n bmax-research python=3.11
-conda activate bmax-research
-
-# 依存関係インストール
-pip install -r requirements.txt
-```
-
-### 2. 基本分析実行
-
-```bash
-# 理論フレームワークのテスト
 python src/bmax_computational_framework.py
-
-# カスタム分析
-python -c "
-from src.bmax_computational_framework import BMAXIntegratedEngine
-engine = BMAXIntegratedEngine()
-results = engine.comprehensive_analysis((45000, 150, 1050), {'volatility': 0.6})
-print('BMAX分析完了:', results['portfolio_characteristics'])
-"
 ```
 
-### 3. 高度な分析
+Python APIの例:
 
 ```python
-import pandas as pd
 from src.bmax_computational_framework import BMAXIntegratedEngine
 
-# シナリオ分析
-scenarios = [
-    {
-        'name': 'Bull Market',
-        'prices': (60000, 200, 1200),
-        'conditions': {'volatility': 0.5, 'regime': 'bull'}
-    },
-    {
-        'name': 'Bear Market', 
-        'prices': (30000, 100, 950),
-        'conditions': {'volatility': 0.8, 'regime': 'bear'}
-    }
-]
-
 engine = BMAXIntegratedEngine()
-scenario_results = engine.scenario_analysis(scenarios)
-print(scenario_results)
+result = engine.comprehensive_analysis(
+    current_prices=(45000.0, 150.0, 1050.0),
+    market_conditions={"volatility": 0.65, "regime": "normal"},
+)
 ```
 
-## 📚 研究文書
+上記の数値は使用方法を示す仮入力であり、現在の市場価格や特定商品の条件ではありません。
 
-### 理論文書
-- **[mathematical_theoretical_framework.md](docs/mathematical_theoretical_framework.md)**: 包括的数学的理論基盤
-- **[empirical_research_design.md](docs/empirical_research_design.md)**: 実証研究設計詳細
+## 主な構成
 
-### 重要な理論的概念
-1. **ハイブリッド証券価値分解理論**
-2. **三層資産相関構造モデル**
-3. **複合オプション価格決定理論**
-4. **ETF流動性変換メカニズム**
-5. **Bitcoin-Aware リスク測定手法**
+```text
+BMAX/
+├── docs/
+│   ├── mathematical_theoretical_framework.md
+│   └── empirical_research_design.md
+├── src/
+│   └── bmax_computational_framework.py
+├── analysis/
+├── models/
+└── README.md
+```
+
+## 実証研究へ進めるために必要なこと
+
+1. 対象ETFと基準日を明示する
+2. 公式の保有銘柄・目論見書・経費率を保存する
+3. 転換社債の個別条項を取得する
+4. 市場データの利用許諾と取得元を確定する
+5. 学習・校正期間とOOS期間を分離する
+6. 単純な株式・債券・ビットコイン比較をベースラインにする
+7. 取引費用、流動性、価格欠損を反映する
+8. 数式、コード、入力、出力の単位テストを追加する
+9. 複数モデルでロバスト性を確認する
+10. 結果が再現できない場合は仮説を棄却する
+
+## 注意
+
+- 本コードは研究用プロトタイプです
+- 実際のETFや転換社債の評価には不十分な可能性があります
+- 市場データサービス名が文書に記載されていても、接続実装・契約・利用権限が存在するとは限りません
+- 本プロジェクトは投資助言、価格保証、売買推奨ではありません
+
+**README最終監査:** 2026-08-01
