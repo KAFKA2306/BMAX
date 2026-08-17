@@ -1,5 +1,7 @@
 # BMAX — ビットコイン関連転換社債ETFの計算研究
 
+[![Benchmark Contract](https://github.com/KAFKA2306/BMAX/actions/workflows/benchmark-contract.yml/badge.svg)](https://github.com/KAFKA2306/BMAX/actions/workflows/benchmark-contract.yml)
+
 ビットコイン関連企業の株式・転換社債とETFを題材に、債券フロア、転換オプション、相関シナリオ、損失指標を計算する研究用プロトタイプです。
 
 **市場校正済みの価格モデルではありません。特定ETFの公正価値、将来価格、流動性改善、下方保護を証明しません。**
