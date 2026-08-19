@@ -1,4 +1,6 @@
+import json
 import unittest
+from pathlib import Path
 
 from src.benchmark_contract import BenchmarkContractError, validate_dataset
 
@@ -21,6 +23,16 @@ def valid_dataset():
 class BenchmarkContractTests(unittest.TestCase):
     def test_valid_contract_reports_coverage_without_claiming_demo_readiness(self):
         report = validate_dataset(valid_dataset())
+        self.assertEqual(report["field_evidence_coverage"], 1.0)
+        self.assertEqual(report["scenario_ready_count"], 1)
+        self.assertFalse(report["commercial_demo_ready"])
+
+    def test_repository_fixture_is_valid_but_not_commercial_demo_ready(self):
+        dataset_path = Path(__file__).parents[1] / "data" / "convertible_benchmark.json"
+        dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
+        report = validate_dataset(dataset)
+        self.assertEqual(report["issuer_count"], 1)
+        self.assertEqual(report["issue_count"], 1)
         self.assertEqual(report["field_evidence_coverage"], 1.0)
         self.assertEqual(report["scenario_ready_count"], 1)
         self.assertFalse(report["commercial_demo_ready"])
