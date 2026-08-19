@@ -21,6 +21,13 @@
       "ticker": "SMLR",
       "cik": "1554859",
       "jurisdiction": "US-DE"
+    },
+    {
+      "id": "riot-platforms-inc",
+      "legal_name": "Riot Platforms, Inc.",
+      "ticker": "RIOT",
+      "cik": "1167419",
+      "jurisdiction": "US-NV"
     }
   ],
   "evidence": [
@@ -58,6 +65,33 @@
       "filed_at": "2025-01-28",
       "source_url": "https://www.sec.gov/Archives/edgar/data/1554859/000110465925006705/tm254669d1_ex4-1.htm",
       "section_ref": "Article 15 — Repurchase of Notes at Option of Holders; Section 15.01 intentionally omitted",
+      "observed_at": "2026-08-20"
+    },
+    {
+      "id": "sec-riot-2024-12-11-8k",
+      "accession_no": "0001104659-24-127656",
+      "filing_type": "8-K",
+      "filed_at": "2024-12-11",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1167419/000110465924127656/tm2430044d5_8k.htm",
+      "section_ref": "Item 1.01 — Convertible Notes Offering; Indenture and the Notes",
+      "observed_at": "2026-08-20"
+    },
+    {
+      "id": "sec-riot-2024-12-11-indenture",
+      "accession_no": "0001104659-24-127656",
+      "filing_type": "8-K Exhibit 4.1",
+      "filed_at": "2024-12-11",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1167419/000110465924127656/tm2430044d5_ex4-1.htm",
+      "section_ref": "Article 15 — Repurchase of Notes at Option of Holders; Section 15.01 reserved",
+      "observed_at": "2026-08-20"
+    },
+    {
+      "id": "sec-riot-2024-12-16-8k",
+      "accession_no": "0001558370-24-016266",
+      "filing_type": "8-K",
+      "filed_at": "2024-12-16",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1167419/000155837024016266/riot-20241216x8k.htm",
+      "section_ref": "Item 8.01 — Convertible Notes Offering",
       "observed_at": "2026-08-20"
     }
   ],
@@ -208,6 +242,54 @@
         "conversion_terms.conversion_price": "sec-smlr-2025-01-28-8k",
         "conversion_terms.conversion_ratio": "sec-smlr-2025-01-28-8k",
         "conversion_terms.reference_share": "sec-smlr-2025-01-28-8k"
+      }
+    },
+    {
+      "id": "riot-2030-0075",
+      "issuer_id": "riot-platforms-inc",
+      "principal": 594400000,
+      "issue_date": "2024-12-11",
+      "maturity_date": "2030-01-15",
+      "coupon": 0.0075,
+      "currency": "USD",
+      "conversion_terms": {
+        "conversion_price": 14.86,
+        "conversion_ratio": 67.2767,
+        "reference_share": "RIOT"
+      },
+      "protection_terms": {
+        "call_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-riot-2024-12-11-8k",
+          "earliest_date": "2028-01-20",
+          "equity_threshold_multiple": 1.3,
+          "required_trading_days": 20,
+          "measurement_window_trading_days": 30
+        },
+        "put_terms": {
+          "status": "ABSENT",
+          "evidence_id": "sec-riot-2024-12-11-indenture"
+        },
+        "redemption_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-riot-2024-12-11-8k",
+          "redemption_price_fraction_of_principal": 1.0
+        },
+        "fundamental_change_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-riot-2024-12-11-8k",
+          "repurchase_price_fraction_of_principal": 1.0
+        }
+      },
+      "evidence_map": {
+        "principal": "sec-riot-2024-12-16-8k",
+        "issue_date": "sec-riot-2024-12-11-8k",
+        "maturity_date": "sec-riot-2024-12-11-8k",
+        "coupon": "sec-riot-2024-12-11-8k",
+        "currency": "sec-riot-2024-12-11-8k",
+        "conversion_terms.conversion_price": "sec-riot-2024-12-11-8k",
+        "conversion_terms.conversion_ratio": "sec-riot-2024-12-11-8k",
+        "conversion_terms.reference_share": "sec-riot-2024-12-11-8k"
       }
     }
   ],
