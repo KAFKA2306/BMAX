@@ -1,0 +1,77 @@
+{
+  "schema_version": "bmax.convertible-benchmark.v1",
+  "issuers": [
+    {
+      "id": "microstrategy-inc",
+      "legal_name": "MicroStrategy Incorporated",
+      "ticker": "MSTR",
+      "cik": "1050446",
+      "jurisdiction": "US-DE"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "sec-mstr-2024-09-20-8k",
+      "accession_no": "0001193125-24-222462",
+      "filing_type": "8-K",
+      "filed_at": "2024-09-20",
+      "source_url": "https://www.sec.gov/Archives/edgar/data/1050446/000119312524222462/d887785d8k.htm",
+      "section_ref": "Item 1.01 — Convertible Note Offering; Indenture and the Notes",
+      "observed_at": "2026-08-20"
+    }
+  ],
+  "issues": [
+    {
+      "id": "mstr-2028-0625",
+      "issuer_id": "microstrategy-inc",
+      "principal": 1010000000,
+      "issue_date": "2024-09-19",
+      "maturity_date": "2028-09-15",
+      "coupon": 0.00625,
+      "currency": "USD",
+      "conversion_terms": {
+        "conversion_price": 183.19,
+        "conversion_ratio": 5.4589,
+        "reference_share": "MSTR"
+      },
+      "protection_terms": {
+        "call_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mstr-2024-09-20-8k",
+          "earliest_date": "2027-12-20",
+          "equity_threshold_multiple": 1.3,
+          "required_trading_days": 20,
+          "measurement_window_trading_days": 30
+        },
+        "put_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mstr-2024-09-20-8k",
+          "holder_put_date": "2027-09-15",
+          "repurchase_price_fraction_of_principal": 1.0
+        },
+        "redemption_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mstr-2024-09-20-8k",
+          "redemption_price_fraction_of_principal": 1.0
+        },
+        "fundamental_change_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mstr-2024-09-20-8k",
+          "repurchase_price_fraction_of_principal": 1.0
+        }
+      },
+      "evidence_map": {
+        "principal": "sec-mstr-2024-09-20-8k",
+        "issue_date": "sec-mstr-2024-09-20-8k",
+        "maturity_date": "sec-mstr-2024-09-20-8k",
+        "coupon": "sec-mstr-2024-09-20-8k",
+        "currency": "sec-mstr-2024-09-20-8k",
+        "conversion_terms.conversion_price": "sec-mstr-2024-09-20-8k",
+        "conversion_terms.conversion_ratio": "sec-mstr-2024-09-20-8k",
+        "conversion_terms.reference_share": "sec-mstr-2024-09-20-8k"
+      }
+    }
+  ],
+  "market_snapshots": [],
+  "scenarios": []
+}
