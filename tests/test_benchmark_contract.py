@@ -1,3 +1,4 @@
+import copy
 import unittest
 from pathlib import Path
 
@@ -50,6 +51,7 @@ class BenchmarkContractTests(unittest.TestCase):
         report = validate_dataset(valid_dataset())
         self.assertEqual(report["field_evidence_coverage"], 1.0)
         self.assertEqual(report["scenario_ready_count"], 1)
+        self.assertEqual(report["scenario_issue_count"], 0)
         self.assertEqual(report["market_snapshot_count"], 0)
         self.assertFalse(report["commercial_demo_ready"])
 
@@ -61,6 +63,7 @@ class BenchmarkContractTests(unittest.TestCase):
         self.assertEqual(report["issue_count"], 6)
         self.assertEqual(report["field_evidence_coverage"], 1.0)
         self.assertEqual(report["scenario_ready_count"], 6)
+        self.assertEqual(report["scenario_issue_count"], 0)
         self.assertEqual(report["market_snapshot_count"], 1)
         self.assertFalse(report["commercial_demo_ready"])
 
@@ -75,6 +78,62 @@ class BenchmarkContractTests(unittest.TestCase):
         self.assertTrue(snapshot["risk_free_curve"]["source_url"].startswith("https://home.treasury.gov/"))
         self.assertIsNone(snapshot["credit_spread_if_observed"])
         self.assertIsNone(snapshot["model_inputs"])
+
+    def test_commercial_demo_requires_scenarios_for_three_distinct_issues(self):
+        data = valid_dataset()
+        base_issuer = data["issuers"][0]
+        data["issuers"] = [
+            {
+                **base_issuer,
+                "id": f"issuer-{index}",
+                "legal_name": f"Example Corp {index}",
+                "ticker": f"EX{index}",
+                "cik": f"{index:010d}",
+            }
+            for index in range(1, 6)
+        ]
+        base_issue = data["issues"][0]
+        data["issues"] = []
+        for index in range(1, 11):
+            issue = copy.deepcopy(base_issue)
+            issue["id"] = f"issue-{index}"
+            issue["issuer_id"] = f"issuer-{((index - 1) % 5) + 1}"
+            data["issues"].append(issue)
+
+        report = validate_dataset(data)
+        self.assertEqual(report["issue_count"], 10)
+        self.assertEqual(report["issuer_count"], 5)
+        self.assertEqual(report["scenario_ready_count"], 10)
+        self.assertEqual(report["scenario_count"], 0)
+        self.assertEqual(report["scenario_issue_count"], 0)
+        self.assertFalse(report["commercial_demo_ready"])
+
+        for index in range(1, 4):
+            snapshot = valid_snapshot()
+            snapshot["id"] = f"snap-{index}"
+            snapshot["issue_id"] = f"issue-{index}"
+            data["market_snapshots"].append(snapshot)
+            data["scenarios"].append(
+                {
+                    "id": f"scenario-{index}",
+                    "issue_id": f"issue-{index}",
+                    "snapshot_id": f"snap-{index}",
+                    "model_version": "research-v1",
+                    "assumptions": {},
+                    "model_output": {
+                        "bond_floor": 90.0,
+                        "conversion_value": 80.0,
+                        "option_component": 15.0,
+                        "var": 20.0,
+                        "expected_shortfall": 25.0,
+                    },
+                }
+            )
+
+        report = validate_dataset(data)
+        self.assertEqual(report["scenario_count"], 3)
+        self.assertEqual(report["scenario_issue_count"], 3)
+        self.assertTrue(report["commercial_demo_ready"])
 
     def test_unverified_is_distinct_from_verified_absence(self):
         data = valid_dataset()
