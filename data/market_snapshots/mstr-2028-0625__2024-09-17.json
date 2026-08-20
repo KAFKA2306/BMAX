@@ -1,0 +1,31 @@
+{
+  "schema_version": "bmax.market-snapshot.v1",
+  "id": "mstr-2028-0625__2024-09-17",
+  "issue_id": "mstr-2028-0625",
+  "as_of": "2024-09-17",
+  "observed_at": "2026-08-20",
+  "equity": {
+    "ticker": "MSTR",
+    "price": 130.8477,
+    "currency": "USD",
+    "observation": "U.S. composite volume-weighted average price from 1:00 p.m. through 4:00 p.m. EDT",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1050446/000119312524221085/d889953dex992.htm"
+  },
+  "risk_free_curve": {
+    "name": "U.S. Treasury Daily Treasury Par Yield Curve Rates",
+    "date": "2024-09-17",
+    "unit": "decimal annual yield",
+    "points": {
+      "3Y": 0.0345,
+      "5Y": 0.0344
+    },
+    "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?field_tdr_date_value=2024&type=daily_treasury_yield_curve"
+  },
+  "credit_spread_if_observed": null,
+  "model_inputs": null,
+  "notes": [
+    "This file contains observed market evidence only; it is not a valuation scenario.",
+    "No credit spread, volatility, Bitcoin price, convertible-bond market price, fair value, or recommendation is inferred here.",
+    "Both the 3-year and 5-year Treasury curve points are retained so a later scenario can state its tenor-selection or interpolation method explicitly."
+  ]
+}
