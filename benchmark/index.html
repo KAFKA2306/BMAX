@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bitcoin Treasury Convertible Bond Benchmark</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111827;background:#f8fafc}body{margin:0}.wrap{max-width:1180px;margin:auto;padding:32px 20px 64px}h1{font-size:clamp(2rem,5vw,4rem);line-height:1.02;margin:.2em 0}.sub{max-width:800px;color:#475569}.panel,.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:18px}.panel{margin:24px 0}.controls{display:grid;grid-template-columns:1fr 2fr auto;gap:12px;align-items:end}label{font-size:.85rem;font-weight:700;color:#334155}select,button{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff}button{background:#111827;color:#fff;font-weight:700;cursor:pointer}.issues{display:flex;gap:8px;flex-wrap:wrap;max-height:160px;overflow:auto;padding:8px 0}.issue-choice{display:flex;gap:6px;align-items:center;border:1px solid #e2e8f0;border-radius:999px;padding:7px 10px;font-size:.85rem}.notice{font-size:.82rem;color:#64748b}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}.metric{border-top:1px solid #e2e8f0;padding:10px 0}.metric b{display:block;font-size:.76rem;color:#64748b;text-transform:uppercase;letter-spacing:.04em}.metric a{color:#0f172a}.tag{display:inline-block;padding:3px 7px;border-radius:999px;font-size:.7rem;font-weight:700;background:#e2e8f0}.observed{background:#dcfce7}.model{background:#fef3c7}.contract{background:#dbeafe}.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:28px}.cta a{padding:11px 14px;border-radius:10px;text-decoration:none;border:1px solid #111827;color:#111827}.cta .primary{background:#111827;color:#fff}.error{color:#b91c1c}@media(max-width:760px){.controls{grid-template-columns:1fr}.wrap{padding-top:20px}}
+</style>
+</head>
+<body><main class="wrap">
+<p class="tag contract">PUBLIC CONTRACT COMPARISON</p>
+<h1>Bitcoin Treasury<br>Convertible Bond Benchmark</h1>
+<p class="sub">SEC提出資料から正規化した転換社債条件を最大3件まで横並び比較します。契約条件、観測市場値、モデル出力は別レイヤーとして表示し、モデル値を公正価値や推奨条件として扱いません。</p>
+<section class="panel"><div class="controls">
+<div><label for="issuer">1. 発行体</label><select id="issuer"><option value="all">すべて</option></select></div>
+<div><label>2. 比較するissue（最大3件）</label><div id="issues" class="issues"></div></div>
+<div><label>&nbsp;</label><button id="compare">3. 条件を比較</button></div>
+</div><p class="notice">主要契約値をクリックすると対応するSEC提出資料を開きます。Scenarioは固定仮定を含む再現可能なモデル出力で、観測市場価格ではありません。</p></section>
+<p id="status" class="notice">データを読み込み中…</p><section id="results" class="grid" aria-live="polite"></section>
+<div class="cta"><a class="primary" href="https://github.com/KAFKA2306/BMAX/issues/new?title=Convertible%20benchmark%20PoC%20inquiry" data-event="poc_cta_clicked">自社条件で比較を依頼する</a><a href="https://github.com/KAFKA2306/BMAX/issues/2">提供範囲と検証条件を見る</a></div>
+</main>
+<script>
+const scenarioFiles={
+'mstr-2028-0625':'mstr-2028-0625__2024-09-17__base-assumption.json',
+'mara-2030-0000':'mara-2030-0000__2024-11-18__base-assumption.json',
+'riot-2030-0075':'riot-2030-0075__2024-12-09__base-assumption.json'};
+let data,scenarios={};const selected=new Set();
+const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
+const pct=n=>(n*100).toFixed(3)+'%';
+function event(name,detail={}){const row={name,at:new Date().toISOString(),...detail};const key='bmax_benchmark_events';const old=JSON.parse(localStorage.getItem(key)||'[]');old.push(row);localStorage.setItem(key,JSON.stringify(old.slice(-100)));}
+function evidence(issue,field){const id=issue.evidence_map[field];return data.evidence.find(x=>x.id===id)?.source_url||'#';}
+function metric(label,value,kind,href){return `<div class="metric"><b>${label} <span class="tag ${kind}">${kind}</span></b>${href?`<a target="_blank" rel="noopener" href="${href}" data-event="filing_opened">${value}</a>`:value}</div>`}
+function renderChoices(){const issuer=document.querySelector('#issuer').value;const list=data.issues.filter(i=>issuer==='all'||i.issuer_id===issuer);document.querySelector('#issues').innerHTML=list.map(i=>`<label class="issue-choice"><input type="checkbox" value="${i.id}" ${selected.has(i.id)?'checked':''}>${i.id}</label>`).join('');document.querySelectorAll('#issues input').forEach(el=>el.onchange=()=>{if(el.checked&&selected.size>=3){el.checked=false;return}el.checked?selected.add(el.value):selected.delete(el.value);event('benchmark_started',{issue_id:el.value});});}
+function protection(t){return ['call_terms','put_terms','redemption_terms','fundamental_change_terms'].map(k=>`${k.replace('_terms','')}: ${t[k]?.status||'UNVERIFIED'}`).join(' / ')}
+function card(issue){const issuer=data.issuers.find(x=>x.id===issue.issuer_id);const s=scenarios[issue.id];return `<article class="card"><p class="tag contract">contract</p><h2>${issuer.ticker} · ${issue.maturity_date.slice(0,4)}</h2>${metric('Principal',money(issue.principal),'contract',evidence(issue,'principal'))}${metric('Coupon',pct(issue.coupon),'contract',evidence(issue,'coupon'))}${metric('Maturity',issue.maturity_date,'contract',evidence(issue,'maturity_date'))}${metric('Conversion price',money(issue.conversion_terms.conversion_price),'contract',evidence(issue,'conversion_terms.conversion_price'))}${metric('Conversion ratio',issue.conversion_terms.conversion_ratio.toFixed(4),'contract',evidence(issue,'conversion_terms.conversion_ratio'))}${metric('Protection terms',protection(issue.protection_terms),'contract')}${s?metric('Scenario theoretical price',money(s.model_output.theoretical_price)+' / $1,000 face','model',`../data/scenarios/${scenarioFiles[issue.id]}`):metric('Scenario','Not available','model')}${s?metric('Bond floor',money(s.model_output.bond_floor)+' / $1,000 face','model'):''}${s?metric('VaR',(s.model_output.var*100).toFixed(2)+'% one-step loss','model'):''}</article>`}
+async function compare(){if(!selected.size){document.querySelector('#status').textContent='1〜3件のissueを選択してください。';return}const ids=[...selected];await Promise.all(ids.map(async id=>{if(scenarioFiles[id]&&!scenarios[id])scenarios[id]=await fetch(`../data/scenarios/${scenarioFiles[id]}`).then(r=>{if(!r.ok)throw Error(r.status);return r.json()})}));document.querySelector('#results').innerHTML=ids.map(id=>card(data.issues.find(i=>i.id===id))).join('');document.querySelector('#status').textContent=`${ids.length}件を比較中。`;event('benchmark_completed',{issue_count:ids.length});bindTrackedLinks();}
+function bindTrackedLinks(){document.querySelectorAll('[data-event]').forEach(a=>a.onclick=()=>event(a.dataset.event,{href:a.href}));}
+async function init(){try{data=await fetch('../data/convertible_benchmark.json').then(r=>{if(!r.ok)throw Error(r.status);return r.json()});document.querySelector('#issuer').innerHTML+=[...data.issuers].sort((a,b)=>a.ticker.localeCompare(b.ticker)).map(i=>`<option value="${i.id}">${i.ticker} — ${i.legal_name}</option>`).join('');document.querySelector('#issuer').onchange=renderChoices;document.querySelector('#compare').onclick=compare;renderChoices();bindTrackedLinks();document.querySelector('#status').textContent=`${data.issues.length} issues / ${data.issuers.length} issuers。`; }catch(e){document.querySelector('#status').className='error';document.querySelector('#status').textContent='正準データを読み込めませんでした。';}}
+init();
+</script></body></html>

@@ -1,0 +1,43 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'benchmark/**'
+      - 'data/convertible_benchmark.json'
+      - 'data/scenarios/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build static artifact
+        run: |
+          mkdir -p _site/benchmark _site/data/scenarios
+          cp benchmark/index.html _site/benchmark/index.html
+          cp data/convertible_benchmark.json _site/data/convertible_benchmark.json
+          cp data/scenarios/*.json _site/data/scenarios/
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
