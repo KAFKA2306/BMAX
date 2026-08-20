@@ -5,11 +5,14 @@ market observations, fair values, or recommendations.
 """
 from __future__ import annotations
 
+import json
 from datetime import date
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
 SCHEMA_VERSION = "bmax.convertible-benchmark.v1"
+MARKET_SNAPSHOT_SCHEMA_VERSION = "bmax.market-snapshot.v1"
 PROTECTION_STATES = {"PRESENT", "ABSENT", "UNVERIFIED"}
 REQUIRED_ISSUE_FIELDS = (
     "principal", "issue_date", "maturity_date", "coupon", "currency",
@@ -92,6 +95,19 @@ def _nested(record: dict[str, Any], path: str) -> Any:
     return current
 
 
+def load_repository_dataset(dataset_path: Path) -> dict[str, Any]:
+    """Load the canonical dataset plus repository market-snapshot artifacts."""
+    root = json.loads(dataset_path.read_text(encoding="utf-8"))
+    existing = _list(root.get("market_snapshots", []), "market_snapshots")
+    snapshot_dir = dataset_path.parent / "market_snapshots"
+    external = []
+    if snapshot_dir.exists():
+        for path in sorted(snapshot_dir.glob("*.json")):
+            external.append(json.loads(path.read_text(encoding="utf-8")))
+    root["market_snapshots"] = [*existing, *external]
+    return root
+
+
 def validate_dataset(dataset: dict[str, Any]) -> dict[str, Any]:
     root = _obj(dataset, "dataset")
     if root.get("schema_version") != SCHEMA_VERSION:
@@ -172,14 +188,39 @@ def validate_dataset(dataset: dict[str, Any]) -> dict[str, Any]:
             scenario_ready += 1
 
     for snapshot_id, snapshot in snapshots.items():
+        if snapshot.get("schema_version") != MARKET_SNAPSHOT_SCHEMA_VERSION:
+            raise BenchmarkContractError(f"{snapshot_id}.schema_version must be {MARKET_SNAPSHOT_SCHEMA_VERSION}")
         issue_id = _text(snapshot.get("issue_id"), f"{snapshot_id}.issue_id")
         if issue_id not in issues:
             raise BenchmarkContractError(f"{snapshot_id}: unknown issue_id {issue_id}")
         _date(snapshot.get("as_of"), f"{snapshot_id}.as_of")
-        _number(snapshot.get("equity_price"), f"{snapshot_id}.equity_price", minimum=0.01)
-        _text(snapshot.get("risk_free_curve_ref"), f"{snapshot_id}.risk_free_curve_ref")
+        _date(snapshot.get("observed_at"), f"{snapshot_id}.observed_at")
+
+        equity = _obj(snapshot.get("equity"), f"{snapshot_id}.equity")
+        _text(equity.get("ticker"), f"{snapshot_id}.equity.ticker")
+        _number(equity.get("price"), f"{snapshot_id}.equity.price", minimum=0.01)
+        _text(equity.get("currency"), f"{snapshot_id}.equity.currency")
+        _text(equity.get("observation"), f"{snapshot_id}.equity.observation")
+        _https_url(equity.get("source_url"), f"{snapshot_id}.equity.source_url")
+
+        curve = _obj(snapshot.get("risk_free_curve"), f"{snapshot_id}.risk_free_curve")
+        _text(curve.get("name"), f"{snapshot_id}.risk_free_curve.name")
+        _date(curve.get("date"), f"{snapshot_id}.risk_free_curve.date")
+        _text(curve.get("unit"), f"{snapshot_id}.risk_free_curve.unit")
+        points = _obj(curve.get("points"), f"{snapshot_id}.risk_free_curve.points")
+        if not points:
+            raise BenchmarkContractError(f"{snapshot_id}.risk_free_curve.points must not be empty")
+        for tenor, value in points.items():
+            _text(tenor, f"{snapshot_id}.risk_free_curve.points tenor")
+            rate = _number(value, f"{snapshot_id}.risk_free_curve.points.{tenor}", minimum=0)
+            if rate > 1:
+                raise BenchmarkContractError(f"{snapshot_id}.risk_free_curve.points.{tenor} must be a decimal rate <= 1")
+        _https_url(curve.get("source_url"), f"{snapshot_id}.risk_free_curve.source_url")
+
         if snapshot.get("credit_spread_if_observed") is not None:
             _number(snapshot["credit_spread_if_observed"], f"{snapshot_id}.credit_spread_if_observed", minimum=0)
+        if snapshot.get("model_inputs") is not None:
+            raise BenchmarkContractError(f"{snapshot_id}.model_inputs must be null in observed market evidence")
 
     for scenario_id, scenario in scenarios.items():
         issue_id = _text(scenario.get("issue_id"), f"{scenario_id}.issue_id")
@@ -202,6 +243,8 @@ def validate_dataset(dataset: dict[str, Any]) -> dict[str, Any]:
         "issuer_count": len(issuers),
         "issue_count": total,
         "evidence_count": len(evidence),
+        "market_snapshot_count": len(snapshots),
+        "scenario_count": len(scenarios),
         "field_evidence_complete_count": evidence_complete,
         "field_evidence_coverage": (evidence_complete / total) if total else 0.0,
         "scenario_ready_count": scenario_ready,
