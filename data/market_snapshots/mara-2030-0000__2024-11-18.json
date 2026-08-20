@@ -1,0 +1,31 @@
+{
+  "schema_version": "bmax.market-snapshot.v1",
+  "id": "mara-2030-0000__2024-11-18",
+  "issue_id": "mara-2030-0000",
+  "as_of": "2024-11-18",
+  "observed_at": "2026-08-20",
+  "equity": {
+    "ticker": "MARA",
+    "price": 18.1848,
+    "currency": "USD",
+    "observation": "U.S. composite volume-weighted average price from 2:00 p.m. through 4:00 p.m. EDT",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1507605/000149315224047078/ex99-1.htm"
+  },
+  "risk_free_curve": {
+    "name": "U.S. Treasury Daily Treasury Par Yield Curve Rates",
+    "date": "2024-11-18",
+    "unit": "decimal annual yield",
+    "points": {
+      "3Y": 0.0425,
+      "5Y": 0.0428
+    },
+    "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?field_tdr_date_value=2024&type=daily_treasury_yield_curve"
+  },
+  "credit_spread_if_observed": null,
+  "model_inputs": null,
+  "notes": [
+    "This file contains observed market evidence only; it is not a valuation scenario.",
+    "No credit spread, volatility, Bitcoin price, convertible-bond market price, fair value, or recommendation is inferred here.",
+    "The equity observation is the issuer-disclosed pricing VWAP used to describe the initial conversion premium."
+  ]
+}

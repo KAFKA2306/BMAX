@@ -1,0 +1,31 @@
+{
+  "schema_version": "bmax.market-snapshot.v1",
+  "id": "riot-2030-0075__2024-12-09",
+  "issue_id": "riot-2030-0075",
+  "as_of": "2024-12-09",
+  "observed_at": "2026-08-20",
+  "equity": {
+    "ticker": "RIOT",
+    "price": 11.2181,
+    "currency": "USD",
+    "observation": "U.S. composite volume-weighted average price from 2:00 p.m. through and including volume reported on the Market Center Official Close",
+    "source_url": "https://www.sec.gov/Archives/edgar/data/1167419/000110465924127656/tm2430044d5_8k.htm"
+  },
+  "risk_free_curve": {
+    "name": "U.S. Treasury Daily Treasury Par Yield Curve Rates",
+    "date": "2024-12-09",
+    "unit": "decimal annual yield",
+    "points": {
+      "3Y": 0.0409,
+      "5Y": 0.0407
+    },
+    "source_url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?field_tdr_date_value=2024&type=daily_treasury_yield_curve"
+  },
+  "credit_spread_if_observed": null,
+  "model_inputs": null,
+  "notes": [
+    "This file contains observed market evidence only; it is not a valuation scenario.",
+    "No credit spread, volatility, Bitcoin price, convertible-bond market price, fair value, or recommendation is inferred here.",
+    "The equity observation is the issuer-disclosed pricing VWAP used to describe the initial conversion premium."
+  ]
+}

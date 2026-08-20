@@ -1,0 +1,57 @@
+{
+  "id": "riot-2030-0075__2024-12-09__base-assumption",
+  "issue_id": "riot-2030-0075",
+  "snapshot_id": "riot-2030-0075__2024-12-09",
+  "model_version": "bmax.convertible-scenario.v1",
+  "assumptions": {
+    "risk_free_tenor": "5Y",
+    "model": {
+      "equity_volatility": 0.6,
+      "credit_spread": 0.02,
+      "note": "Fixed scenario assumptions; neither value is represented as an observed market fact."
+    },
+    "risk_simulation": {
+      "normalized_initial_level": 100.0,
+      "time_horizon_years": 1.0,
+      "n_steps": 252,
+      "n_simulations": 5000,
+      "seed": 20241209,
+      "tail_probability": 0.05,
+      "bitcoin_regime": "normal",
+      "bitcoin_drift": 0.0,
+      "bitcoin_volatility": 0.8,
+      "bitcoin_jump_intensity": 0.0,
+      "bitcoin_jump_mean": 0.0,
+      "bitcoin_jump_std": 0.0,
+      "stock_drift": 0.0,
+      "stock_volatility": 0.6,
+      "cb_drift": 0.0,
+      "cb_volatility": 0.4,
+      "bitcoin_stock_correlation": 0.7,
+      "stock_cb_correlation": 0.5,
+      "note": "Normalized levels and fixed parameters are scenario inputs for deterministic risk simulation, not observed prices or forecasts."
+    }
+  },
+  "model_output": {
+    "bond_floor": 766.63427332884,
+    "conversion_value": 754.71674827,
+    "option_component": 364.96912851388,
+    "theoretical_price": 1131.60340184272,
+    "var": 0.041832464149,
+    "expected_shortfall": 0.052365569432,
+    "units": {
+      "bond_floor": "USD per 1000 USD face value",
+      "conversion_value": "USD per 1000 USD face value",
+      "option_component": "USD per 1000 USD face value",
+      "theoretical_price": "USD per 1000 USD face value",
+      "var": "one-step log-return loss fraction",
+      "expected_shortfall": "one-step log-return loss fraction"
+    }
+  },
+  "claim_boundary": {
+    "scenario_not_observed_market_value": true,
+    "calibrated_to_market": false,
+    "fair_value_claim": false,
+    "recommendation": false
+  }
+}
