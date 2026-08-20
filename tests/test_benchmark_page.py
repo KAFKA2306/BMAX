@@ -22,6 +22,12 @@ class BenchmarkPageContractTest(unittest.TestCase):
 
     def test_contract_market_model_layers_are_not_relabelled(self) -> None:
         self.assertIn('class="tag contract"', self.html)
+        self.assertIn("../data/market_snapshots/", self.html)
+        self.assertIn("Equity ${m.equity.observation}", self.html)
+        self.assertIn("U.S. Treasury par yield", self.html)
+        self.assertIn("m.equity.source_url", self.html)
+        self.assertIn("m.risk_free_curve.source_url", self.html)
+        self.assertIn("'observed'", self.html)
         self.assertIn("Scenario theoretical price", self.html)
         self.assertIn("model_output.theoretical_price", self.html)
         self.assertNotIn("fair value", self.html.lower())

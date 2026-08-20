@@ -6,6 +6,7 @@ on:
     paths:
       - 'benchmark/**'
       - 'data/convertible_benchmark.json'
+      - 'data/market_snapshots/**'
       - 'data/scenarios/**'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
@@ -29,9 +30,10 @@ jobs:
       - uses: actions/checkout@v6
       - name: Build static artifact
         run: |
-          mkdir -p _site/benchmark _site/data/scenarios
+          mkdir -p _site/benchmark _site/data/market_snapshots _site/data/scenarios
           cp benchmark/index.html _site/benchmark/index.html
           cp data/convertible_benchmark.json _site/data/convertible_benchmark.json
+          cp data/market_snapshots/*.json _site/data/market_snapshots/
           cp data/scenarios/*.json _site/data/scenarios/
           touch _site/.nojekyll
       - uses: actions/configure-pages@v5
