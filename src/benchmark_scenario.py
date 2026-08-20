@@ -10,7 +10,7 @@ from typing import Any
 
 import numpy as np
 
-from bmax_computational_framework import (
+from .bmax_computational_framework import (
     BMXRiskEngine,
     BitcoinBlackScholesEngine,
     BitcoinMarketParams,
