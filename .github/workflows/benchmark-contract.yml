@@ -9,12 +9,15 @@ on:
       - 'src/bmax_computational_framework.py'
       - 'tests/test_benchmark_contract.py'
       - 'tests/test_benchmark_scenario.py'
+      - 'tests/test_benchmark_page.py'
+      - 'benchmark/**'
       - 'data/convertible_benchmark.json'
       - 'data/market_snapshots/**'
       - 'data/scenarios/**'
       - 'docs/convertible-benchmark-contract.md'
       - '.gitignore'
       - '.github/workflows/benchmark-contract.yml'
+      - '.github/workflows/pages.yml'
   push:
     branches: [main]
     paths:
@@ -24,12 +27,15 @@ on:
       - 'src/bmax_computational_framework.py'
       - 'tests/test_benchmark_contract.py'
       - 'tests/test_benchmark_scenario.py'
+      - 'tests/test_benchmark_page.py'
+      - 'benchmark/**'
       - 'data/convertible_benchmark.json'
       - 'data/market_snapshots/**'
       - 'data/scenarios/**'
       - 'docs/convertible-benchmark-contract.md'
       - '.gitignore'
       - '.github/workflows/benchmark-contract.yml'
+      - '.github/workflows/pages.yml'
 
 permissions:
   contents: read
@@ -45,11 +51,11 @@ jobs:
           python-version: '3.12'
       - name: Install pinned scenario runtime
         run: python -m pip install numpy==2.3.5 pandas==2.2.3 scipy==1.17.0
-      - name: Compile contract and scenario modules
+      - name: Compile contract, scenario, and page tests
         run: |
-          python -m py_compile src/benchmark_contract.py src/benchmark_repository.py src/benchmark_scenario.py tests/test_benchmark_contract.py tests/test_benchmark_scenario.py
+          python -m py_compile src/benchmark_contract.py src/benchmark_repository.py src/benchmark_scenario.py tests/test_benchmark_contract.py tests/test_benchmark_scenario.py tests/test_benchmark_page.py
       - name: Run contract boundary tests
-        run: python -m unittest tests.test_benchmark_contract tests.test_benchmark_scenario -v
+        run: python -m unittest tests.test_benchmark_contract tests.test_benchmark_scenario tests.test_benchmark_page -v
       - name: Remove runtime caches
         if: always()
         run: |
