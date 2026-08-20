@@ -129,14 +129,47 @@
       "maturity_date": "2028-09-15",
       "coupon": 0.00625,
       "currency": "USD",
-      "conversion_terms": {"conversion_price": 183.19, "conversion_ratio": 5.4589, "reference_share": "MSTR"},
-      "protection_terms": {
-        "call_terms": {"status": "PRESENT", "evidence_id": "sec-mstr-2024-09-20-8k", "earliest_date": "2027-12-20", "equity_threshold_multiple": 1.3, "required_trading_days": 20, "measurement_window_trading_days": 30},
-        "put_terms": {"status": "PRESENT", "evidence_id": "sec-mstr-2024-09-20-8k", "holder_put_date": "2027-09-15", "repurchase_price_fraction_of_principal": 1.0},
-        "redemption_terms": {"status": "PRESENT", "evidence_id": "sec-mstr-2024-09-20-8k", "redemption_price_fraction_of_principal": 1.0},
-        "fundamental_change_terms": {"status": "PRESENT", "evidence_id": "sec-mstr-2024-09-20-8k", "repurchase_price_fraction_of_principal": 1.0}
+      "conversion_terms": {
+        "conversion_price": 183.19,
+        "conversion_ratio": 5.4589,
+        "reference_share": "MSTR"
       },
-      "evidence_map": {"principal":"sec-mstr-2024-09-20-8k","issue_date":"sec-mstr-2024-09-20-8k","maturity_date":"sec-mstr-2024-09-20-8k","coupon":"sec-mstr-2024-09-20-8k","currency":"sec-mstr-2024-09-20-8k","conversion_terms.conversion_price":"sec-mstr-2024-09-20-8k","conversion_terms.conversion_ratio":"sec-mstr-2024-09-20-8k","conversion_terms.reference_share":"sec-mstr-2024-09-20-8k"}
+      "protection_terms": {
+        "call_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mstr-2024-09-20-8k",
+          "earliest_date": "2027-12-20",
+          "equity_threshold_multiple": 1.3,
+          "required_trading_days": 20,
+          "measurement_window_trading_days": 30
+        },
+        "put_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mstr-2024-09-20-8k",
+          "holder_put_date": "2027-09-15",
+          "repurchase_price_fraction_of_principal": 1.0
+        },
+        "redemption_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mstr-2024-09-20-8k",
+          "redemption_price_fraction_of_principal": 1.0
+        },
+        "fundamental_change_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mstr-2024-09-20-8k",
+          "repurchase_price_fraction_of_principal": 1.0
+        }
+      },
+      "evidence_map": {
+        "principal": "sec-mstr-2024-09-20-8k",
+        "issue_date": "sec-mstr-2024-09-20-8k",
+        "maturity_date": "sec-mstr-2024-09-20-8k",
+        "coupon": "sec-mstr-2024-09-20-8k",
+        "currency": "sec-mstr-2024-09-20-8k",
+        "conversion_terms.conversion_price": "sec-mstr-2024-09-20-8k",
+        "conversion_terms.conversion_ratio": "sec-mstr-2024-09-20-8k",
+        "conversion_terms.reference_share": "sec-mstr-2024-09-20-8k"
+      }
     },
     {
       "id": "mara-2030-0000",
@@ -146,14 +179,47 @@
       "maturity_date": "2030-03-01",
       "coupon": 0.0,
       "currency": "USD",
-      "conversion_terms": {"conversion_price": 25.9133, "conversion_ratio": 38.5902, "reference_share": "MARA"},
-      "protection_terms": {
-        "call_terms": {"status": "PRESENT", "evidence_id": "sec-mara-2024-11-21-8k", "earliest_date": "2028-03-05", "equity_threshold_multiple": 1.3, "required_trading_days": 20, "measurement_window_trading_days": 30},
-        "put_terms": {"status": "PRESENT", "evidence_id": "sec-mara-2024-11-21-8k", "holder_put_date": "2027-12-01", "repurchase_price_fraction_of_principal": 1.0},
-        "redemption_terms": {"status": "PRESENT", "evidence_id": "sec-mara-2024-11-21-8k", "redemption_price_fraction_of_principal": 1.0},
-        "fundamental_change_terms": {"status": "PRESENT", "evidence_id": "sec-mara-2024-11-21-8k", "repurchase_price_fraction_of_principal": 1.0}
+      "conversion_terms": {
+        "conversion_price": 25.9133,
+        "conversion_ratio": 38.5902,
+        "reference_share": "MARA"
       },
-      "evidence_map": {"principal":"sec-mara-2024-11-21-8k","issue_date":"sec-mara-2024-11-21-8k","maturity_date":"sec-mara-2024-11-21-8k","coupon":"sec-mara-2024-11-21-8k","currency":"sec-mara-2024-11-21-8k","conversion_terms.conversion_price":"sec-mara-2024-11-21-8k","conversion_terms.conversion_ratio":"sec-mara-2024-11-21-8k","conversion_terms.reference_share":"sec-mara-2024-11-21-8k"}
+      "protection_terms": {
+        "call_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mara-2024-11-21-8k",
+          "earliest_date": "2028-03-05",
+          "equity_threshold_multiple": 1.3,
+          "required_trading_days": 20,
+          "measurement_window_trading_days": 30
+        },
+        "put_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mara-2024-11-21-8k",
+          "holder_put_date": "2027-12-01",
+          "repurchase_price_fraction_of_principal": 1.0
+        },
+        "redemption_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mara-2024-11-21-8k",
+          "redemption_price_fraction_of_principal": 1.0
+        },
+        "fundamental_change_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-mara-2024-11-21-8k",
+          "repurchase_price_fraction_of_principal": 1.0
+        }
+      },
+      "evidence_map": {
+        "principal": "sec-mara-2024-11-21-8k",
+        "issue_date": "sec-mara-2024-11-21-8k",
+        "maturity_date": "sec-mara-2024-11-21-8k",
+        "coupon": "sec-mara-2024-11-21-8k",
+        "currency": "sec-mara-2024-11-21-8k",
+        "conversion_terms.conversion_price": "sec-mara-2024-11-21-8k",
+        "conversion_terms.conversion_ratio": "sec-mara-2024-11-21-8k",
+        "conversion_terms.reference_share": "sec-mara-2024-11-21-8k"
+      }
     },
     {
       "id": "smlr-2030-0425",
@@ -163,14 +229,45 @@
       "maturity_date": "2030-08-01",
       "coupon": 0.0425,
       "currency": "USD",
-      "conversion_terms": {"conversion_price": 76.44, "conversion_ratio": 13.0826, "reference_share": "SMLR"},
-      "protection_terms": {
-        "call_terms": {"status": "PRESENT", "evidence_id": "sec-smlr-2025-01-28-8k", "earliest_date": "2028-08-04", "equity_threshold_multiple": 1.3, "required_trading_days": 20, "measurement_window_trading_days": 30},
-        "put_terms": {"status": "ABSENT", "evidence_id": "sec-smlr-2025-01-28-indenture"},
-        "redemption_terms": {"status": "PRESENT", "evidence_id": "sec-smlr-2025-01-28-8k", "redemption_price_fraction_of_principal": 1.0},
-        "fundamental_change_terms": {"status": "PRESENT", "evidence_id": "sec-smlr-2025-01-28-8k", "repurchase_price_fraction_of_principal": 1.0}
+      "conversion_terms": {
+        "conversion_price": 76.44,
+        "conversion_ratio": 13.0826,
+        "reference_share": "SMLR"
       },
-      "evidence_map": {"principal":"sec-smlr-2025-01-28-8k","issue_date":"sec-smlr-2025-01-28-8k","maturity_date":"sec-smlr-2025-01-28-8k","coupon":"sec-smlr-2025-01-28-8k","currency":"sec-smlr-2025-01-28-8k","conversion_terms.conversion_price":"sec-smlr-2025-01-28-8k","conversion_terms.conversion_ratio":"sec-smlr-2025-01-28-8k","conversion_terms.reference_share":"sec-smlr-2025-01-28-8k"}
+      "protection_terms": {
+        "call_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-smlr-2025-01-28-8k",
+          "earliest_date": "2028-08-04",
+          "equity_threshold_multiple": 1.3,
+          "required_trading_days": 20,
+          "measurement_window_trading_days": 30
+        },
+        "put_terms": {
+          "status": "ABSENT",
+          "evidence_id": "sec-smlr-2025-01-28-indenture"
+        },
+        "redemption_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-smlr-2025-01-28-8k",
+          "redemption_price_fraction_of_principal": 1.0
+        },
+        "fundamental_change_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-smlr-2025-01-28-8k",
+          "repurchase_price_fraction_of_principal": 1.0
+        }
+      },
+      "evidence_map": {
+        "principal": "sec-smlr-2025-01-28-8k",
+        "issue_date": "sec-smlr-2025-01-28-8k",
+        "maturity_date": "sec-smlr-2025-01-28-8k",
+        "coupon": "sec-smlr-2025-01-28-8k",
+        "currency": "sec-smlr-2025-01-28-8k",
+        "conversion_terms.conversion_price": "sec-smlr-2025-01-28-8k",
+        "conversion_terms.conversion_ratio": "sec-smlr-2025-01-28-8k",
+        "conversion_terms.reference_share": "sec-smlr-2025-01-28-8k"
+      }
     },
     {
       "id": "riot-2030-0075",
@@ -180,14 +277,45 @@
       "maturity_date": "2030-01-15",
       "coupon": 0.0075,
       "currency": "USD",
-      "conversion_terms": {"conversion_price": 14.86, "conversion_ratio": 67.2767, "reference_share": "RIOT"},
-      "protection_terms": {
-        "call_terms": {"status": "PRESENT", "evidence_id": "sec-riot-2024-12-11-8k", "earliest_date": "2028-01-20", "equity_threshold_multiple": 1.3, "required_trading_days": 20, "measurement_window_trading_days": 30},
-        "put_terms": {"status": "ABSENT", "evidence_id": "sec-riot-2024-12-11-indenture"},
-        "redemption_terms": {"status": "PRESENT", "evidence_id": "sec-riot-2024-12-11-8k", "redemption_price_fraction_of_principal": 1.0},
-        "fundamental_change_terms": {"status": "PRESENT", "evidence_id": "sec-riot-2024-12-11-8k", "repurchase_price_fraction_of_principal": 1.0}
+      "conversion_terms": {
+        "conversion_price": 14.86,
+        "conversion_ratio": 67.2767,
+        "reference_share": "RIOT"
       },
-      "evidence_map": {"principal":"sec-riot-2024-12-16-8k","issue_date":"sec-riot-2024-12-11-8k","maturity_date":"sec-riot-2024-12-11-8k","coupon":"sec-riot-2024-12-11-8k","currency":"sec-riot-2024-12-11-8k","conversion_terms.conversion_price":"sec-riot-2024-12-11-8k","conversion_terms.conversion_ratio":"sec-riot-2024-12-11-8k","conversion_terms.reference_share":"sec-riot-2024-12-11-8k"}
+      "protection_terms": {
+        "call_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-riot-2024-12-11-8k",
+          "earliest_date": "2028-01-20",
+          "equity_threshold_multiple": 1.3,
+          "required_trading_days": 20,
+          "measurement_window_trading_days": 30
+        },
+        "put_terms": {
+          "status": "ABSENT",
+          "evidence_id": "sec-riot-2024-12-11-indenture"
+        },
+        "redemption_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-riot-2024-12-11-8k",
+          "redemption_price_fraction_of_principal": 1.0
+        },
+        "fundamental_change_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-riot-2024-12-11-8k",
+          "repurchase_price_fraction_of_principal": 1.0
+        }
+      },
+      "evidence_map": {
+        "principal": "sec-riot-2024-12-16-8k",
+        "issue_date": "sec-riot-2024-12-11-8k",
+        "maturity_date": "sec-riot-2024-12-11-8k",
+        "coupon": "sec-riot-2024-12-11-8k",
+        "currency": "sec-riot-2024-12-11-8k",
+        "conversion_terms.conversion_price": "sec-riot-2024-12-11-8k",
+        "conversion_terms.conversion_ratio": "sec-riot-2024-12-11-8k",
+        "conversion_terms.reference_share": "sec-riot-2024-12-11-8k"
+      }
     },
     {
       "id": "clsk-2032-0000",
@@ -197,14 +325,45 @@
       "maturity_date": "2032-02-15",
       "coupon": 0.0,
       "currency": "USD",
-      "conversion_terms": {"conversion_price": 19.16, "conversion_ratio": 52.1832, "reference_share": "CLSK"},
-      "protection_terms": {
-        "call_terms": {"status": "PRESENT", "evidence_id": "sec-clsk-2025-11-13-8k", "earliest_date": "2029-02-20", "equity_threshold_multiple": 1.3, "required_trading_days": 20, "measurement_window_trading_days": 30},
-        "put_terms": {"status": "ABSENT", "evidence_id": "sec-clsk-2025-11-13-indenture"},
-        "redemption_terms": {"status": "PRESENT", "evidence_id": "sec-clsk-2025-11-13-8k", "redemption_price_fraction_of_principal": 1.0},
-        "fundamental_change_terms": {"status": "PRESENT", "evidence_id": "sec-clsk-2025-11-13-8k", "repurchase_price_fraction_of_principal": 1.0}
+      "conversion_terms": {
+        "conversion_price": 19.16,
+        "conversion_ratio": 52.1832,
+        "reference_share": "CLSK"
       },
-      "evidence_map": {"principal":"sec-clsk-2025-11-13-8k","issue_date":"sec-clsk-2025-11-13-8k","maturity_date":"sec-clsk-2025-11-13-8k","coupon":"sec-clsk-2025-11-13-8k","currency":"sec-clsk-2025-11-13-8k","conversion_terms.conversion_price":"sec-clsk-2025-11-13-8k","conversion_terms.conversion_ratio":"sec-clsk-2025-11-13-8k","conversion_terms.reference_share":"sec-clsk-2025-11-13-8k"}
+      "protection_terms": {
+        "call_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-clsk-2025-11-13-8k",
+          "earliest_date": "2029-02-20",
+          "equity_threshold_multiple": 1.3,
+          "required_trading_days": 20,
+          "measurement_window_trading_days": 30
+        },
+        "put_terms": {
+          "status": "ABSENT",
+          "evidence_id": "sec-clsk-2025-11-13-indenture"
+        },
+        "redemption_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-clsk-2025-11-13-8k",
+          "redemption_price_fraction_of_principal": 1.0
+        },
+        "fundamental_change_terms": {
+          "status": "PRESENT",
+          "evidence_id": "sec-clsk-2025-11-13-8k",
+          "repurchase_price_fraction_of_principal": 1.0
+        }
+      },
+      "evidence_map": {
+        "principal": "sec-clsk-2025-11-13-8k",
+        "issue_date": "sec-clsk-2025-11-13-8k",
+        "maturity_date": "sec-clsk-2025-11-13-8k",
+        "coupon": "sec-clsk-2025-11-13-8k",
+        "currency": "sec-clsk-2025-11-13-8k",
+        "conversion_terms.conversion_price": "sec-clsk-2025-11-13-8k",
+        "conversion_terms.conversion_ratio": "sec-clsk-2025-11-13-8k",
+        "conversion_terms.reference_share": "sec-clsk-2025-11-13-8k"
+      }
     }
   ],
   "market_snapshots": [],
