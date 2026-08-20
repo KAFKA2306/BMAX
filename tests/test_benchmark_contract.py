@@ -64,11 +64,11 @@ class BenchmarkContractTests(unittest.TestCase):
         self.assertEqual(report["field_evidence_coverage"], 1.0)
         self.assertEqual(report["scenario_ready_count"], 10)
         self.assertEqual(report["scenario_issue_count"], 0)
-        self.assertEqual(report["market_snapshot_count"], 1)
+        self.assertEqual(report["market_snapshot_count"], 3)
         self.assertFalse(report["commercial_demo_ready"])
 
-        snapshot = dataset["market_snapshots"][0]
-        self.assertEqual(snapshot["id"], "mstr-2028-0625__2024-09-17")
+        snapshots = {item["id"]: item for item in dataset["market_snapshots"]}
+        snapshot = snapshots["mstr-2028-0625__2024-09-17"]
         self.assertEqual(snapshot["issue_id"], "mstr-2028-0625")
         self.assertEqual(snapshot["as_of"], "2024-09-17")
         self.assertEqual(snapshot["equity"]["ticker"], "MSTR")
