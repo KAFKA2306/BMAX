@@ -37,6 +37,25 @@ class BenchmarkContractTests(unittest.TestCase):
         self.assertEqual(report["scenario_ready_count"], 5)
         self.assertFalse(report["commercial_demo_ready"])
 
+    def test_observed_market_snapshot_does_not_smuggle_model_assumptions(self):
+        root = Path(__file__).parents[1]
+        dataset = json.loads((root / "data" / "convertible_benchmark.json").read_text(encoding="utf-8"))
+        snapshot = json.loads((root / "data" / "market_snapshots" / "mstr-2028-0625__2024-09-17.json").read_text(encoding="utf-8"))
+
+        issue_ids = {issue["id"] for issue in dataset["issues"]}
+        self.assertIn(snapshot["issue_id"], issue_ids)
+        self.assertEqual(snapshot["schema_version"], "bmax.market-snapshot.v1")
+        self.assertEqual(snapshot["as_of"], "2024-09-17")
+        self.assertEqual(snapshot["equity"]["ticker"], "MSTR")
+        self.assertAlmostEqual(snapshot["equity"]["price"], 130.8477)
+        self.assertEqual(snapshot["risk_free_curve"]["points"], {"3Y": 0.0345, "5Y": 0.0344})
+        self.assertTrue(snapshot["equity"]["source_url"].startswith("https://www.sec.gov/"))
+        self.assertTrue(snapshot["risk_free_curve"]["source_url"].startswith("https://home.treasury.gov/"))
+        self.assertIsNone(snapshot["credit_spread_if_observed"])
+        self.assertIsNone(snapshot["model_inputs"])
+        forbidden = {"fair_value", "recommendation", "volatility", "bitcoin_price", "convertible_bond_market_price"}
+        self.assertTrue(forbidden.isdisjoint(snapshot))
+
     def test_unverified_is_distinct_from_verified_absence(self):
         data = valid_dataset()
         data["issues"][0]["protection_terms"]["put_terms"] = {"status":"UNVERIFIED","evidence_id":None}
