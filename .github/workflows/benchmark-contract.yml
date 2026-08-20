@@ -5,6 +5,8 @@ on:
     paths:
       - 'src/benchmark_contract.py'
       - 'tests/test_benchmark_contract.py'
+      - 'data/convertible_benchmark.json'
+      - 'data/market_snapshots/**'
       - 'docs/convertible-benchmark-contract.md'
       - '.gitignore'
       - '.github/workflows/benchmark-contract.yml'
@@ -13,6 +15,8 @@ on:
     paths:
       - 'src/benchmark_contract.py'
       - 'tests/test_benchmark_contract.py'
+      - 'data/convertible_benchmark.json'
+      - 'data/market_snapshots/**'
       - 'docs/convertible-benchmark-contract.md'
       - '.gitignore'
       - '.github/workflows/benchmark-contract.yml'
