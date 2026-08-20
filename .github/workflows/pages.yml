@@ -43,3 +43,23 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify deployed benchmark and canonical data
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          base="${PAGE_URL%/}"
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 "$base/benchmark/" -o /tmp/benchmark.html
+          curl --fail --silent --show-error --location --retry 3 --retry-delay 2 "$base/data/convertible_benchmark.json" -o /tmp/convertible_benchmark.json
+          grep -F 'Bitcoin Treasury Convertible Bond Benchmark' /tmp/benchmark.html
+          grep -F 'PUBLIC CONTRACT COMPARISON' /tmp/benchmark.html
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path('/tmp/convertible_benchmark.json').read_text())
+          assert len(data['issues']) >= 10
+          assert len(data['issuers']) >= 5
+          assert len(data.get('evidence', [])) > 0
+          print({'issues': len(data['issues']), 'issuers': len(data['issuers']), 'evidence': len(data['evidence'])})
+          PY
