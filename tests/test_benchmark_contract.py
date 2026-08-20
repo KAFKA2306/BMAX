@@ -31,10 +31,10 @@ class BenchmarkContractTests(unittest.TestCase):
         dataset_path = Path(__file__).parents[1] / "data" / "convertible_benchmark.json"
         dataset = json.loads(dataset_path.read_text(encoding="utf-8"))
         report = validate_dataset(dataset)
-        self.assertEqual(report["issuer_count"], 4)
-        self.assertEqual(report["issue_count"], 4)
+        self.assertEqual(report["issuer_count"], 5)
+        self.assertEqual(report["issue_count"], 5)
         self.assertEqual(report["field_evidence_coverage"], 1.0)
-        self.assertEqual(report["scenario_ready_count"], 4)
+        self.assertEqual(report["scenario_ready_count"], 5)
         self.assertFalse(report["commercial_demo_ready"])
 
     def test_unverified_is_distinct_from_verified_absence(self):
