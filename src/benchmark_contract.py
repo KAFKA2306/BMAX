@@ -158,7 +158,7 @@ def validate_dataset(dataset: dict[str, Any]) -> dict[str, Any]:
         conversion = _obj(issue.get("conversion_terms"), f"{issue_id}.conversion_terms")
         _number(conversion.get("conversion_price"), f"{issue_id}.conversion_price", minimum=0.01)
         _number(conversion.get("conversion_ratio"), f"{issue_id}.conversion_ratio", minimum=0.000001)
-        _text(conversion.get("reference_share"), f"{issue_id}.reference_share")
+        _text(conversion.get("reference_share"), f"{issue_id}.conversion_terms.reference_share")
 
         protection = _obj(issue.get("protection_terms"), f"{issue_id}.protection_terms")
         all_protection_verified = True
@@ -222,6 +222,7 @@ def validate_dataset(dataset: dict[str, Any]) -> dict[str, Any]:
         if snapshot.get("model_inputs") is not None:
             raise BenchmarkContractError(f"{snapshot_id}.model_inputs must be null in observed market evidence")
 
+    scenario_issue_ids: set[str] = set()
     for scenario_id, scenario in scenarios.items():
         issue_id = _text(scenario.get("issue_id"), f"{scenario_id}.issue_id")
         snapshot_id = _text(scenario.get("snapshot_id"), f"{scenario_id}.snapshot_id")
@@ -236,8 +237,10 @@ def validate_dataset(dataset: dict[str, Any]) -> dict[str, Any]:
             raise BenchmarkContractError(f"{scenario_id}: fair_value/recommendation assertions are forbidden")
         for field in ("bond_floor", "conversion_value", "option_component", "var", "expected_shortfall"):
             _number(output.get(field), f"{scenario_id}.model_output.{field}")
+        scenario_issue_ids.add(issue_id)
 
     total = len(issues)
+    scenario_issue_count = len(scenario_issue_ids)
     return {
         "schema_version": SCHEMA_VERSION,
         "issuer_count": len(issuers),
@@ -245,8 +248,15 @@ def validate_dataset(dataset: dict[str, Any]) -> dict[str, Any]:
         "evidence_count": len(evidence),
         "market_snapshot_count": len(snapshots),
         "scenario_count": len(scenarios),
+        "scenario_issue_count": scenario_issue_count,
         "field_evidence_complete_count": evidence_complete,
         "field_evidence_coverage": (evidence_complete / total) if total else 0.0,
         "scenario_ready_count": scenario_ready,
-        "commercial_demo_ready": bool(total >= 10 and len(issuers) >= 5 and evidence_complete == total and scenario_ready >= 3),
+        "commercial_demo_ready": bool(
+            total >= 10
+            and len(issuers) >= 5
+            and evidence_complete == total
+            and scenario_ready >= 3
+            and scenario_issue_count >= 3
+        ),
     }
