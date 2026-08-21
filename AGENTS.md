@@ -20,6 +20,14 @@ Own the Bitcoin-treasury convertible-bond benchmark and its reproducible contrac
 5. For implementation changes, run the smallest relevant model/data tests and verify the exact reviewed revision.
 6. Stop at the verified fixed point. Do not extend a completed benchmark decision into speculative analytics or sales tooling.
 
+## Branch lifecycle
+
+- Aside from the default branch and unavoidable platform-managed/protected branches, a persistent branch is permitted only while it is the head branch of a currently open PR.
+- Creating a work branch creates an obligation to open or reuse its canonical PR immediately; do not use branches as backlog, continuation state, backup, archive, or evidence storage.
+- After a PR is merged or closed, delete its head branch after verifying PR/main state. A branch with no open PR is an orphan and must be deleted.
+- Before and after work, compare repository branches with open PR heads. Do not report cleanup/fixed point while an orphan task branch remains.
+- If the available tool cannot delete a branch, record that as a tooling blocker and do not claim cleanup complete. Never create another orphan branch as a workaround.
+
 ## Merge and release are separate
 
 ### PR merge conditions
@@ -44,4 +52,4 @@ A merged PR does not prove product release. A release blocker does not retroacti
 
 ## Completion report
 
-Report material Before -> After coverage/capability, primary evidence and canonical artifact, Issue/PR/commit/check evidence, then report `merged` and `released` separately with direct evidence for each. Include commercial outcome only when observed, complexity/manual work removed, and the remaining blocker.
+Report material Before -> After coverage/capability, primary evidence and canonical artifact, Issue/PR/commit/check evidence, then report `merged` and `released` separately with direct evidence for each. Include branch cleanup state, commercial outcome only when observed, complexity/manual work removed, and the remaining blocker.
