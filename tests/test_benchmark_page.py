@@ -13,6 +13,14 @@ class BenchmarkPageContractTest(unittest.TestCase):
         self.assertIn("../data/convertible_benchmark.json", self.html)
         self.assertIn("selected.size>=3", self.html)
 
+    def test_visible_selection_matches_decision_input(self) -> None:
+        self.assertIn('id="selection-summary"', self.html)
+        self.assertIn("const visibleIds=new Set(list.map(i=>i.id))", self.html)
+        self.assertIn("if(!visibleIds.has(id))selected.delete(id)", self.html)
+        self.assertIn("button.disabled=count===0", self.html)
+        self.assertIn("markComparisonDirty()", self.html)
+        self.assertIn("document.querySelector('#results').innerHTML=''", self.html)
+
     def test_evidence_and_claim_boundaries_are_visible(self) -> None:
         self.assertIn("SEC提出資料", self.html)
         self.assertIn("公正価値や推奨条件として扱いません", self.html)
