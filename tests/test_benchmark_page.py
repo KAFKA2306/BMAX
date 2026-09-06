@@ -6,18 +6,19 @@ class BenchmarkPageContractTest(unittest.TestCase):
     def setUp(self) -> None:
         self.html = Path("benchmark/index.html").read_text(encoding="utf-8")
 
-    def test_three_step_comparison_and_canonical_data_source(self) -> None:
+    def test_selection_immediately_drives_comparison_from_canonical_data(self) -> None:
         self.assertIn('id="issuer"', self.html)
         self.assertIn('id="issues"', self.html)
-        self.assertIn('id="compare"', self.html)
+        self.assertNotIn('id="compare"', self.html)
         self.assertIn("../data/convertible_benchmark.json", self.html)
         self.assertIn("selected.size>=3", self.html)
+        self.assertIn("el.onchange=async()=>", self.html)
+        self.assertIn("await compare();", self.html)
 
     def test_visible_selection_matches_decision_input(self) -> None:
         self.assertIn('id="selection-summary"', self.html)
         self.assertIn("const visibleIds=new Set(list.map(i=>i.id))", self.html)
         self.assertIn("if(!visibleIds.has(id))selected.delete(id)", self.html)
-        self.assertIn("button.disabled=count===0", self.html)
         self.assertIn("markComparisonDirty()", self.html)
         self.assertIn("document.querySelector('#results').innerHTML=''", self.html)
 
